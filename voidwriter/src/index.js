@@ -2,47 +2,78 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-//import omain from "./image/omain.png";
-
 class Glyph extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      ctx: null,
+      images: [],
+      images_to_load: -1,
+    };
+  }
+
+  componentDidMount() {
+    this.updateCanvas();
   }
   
-  render() {
+  updateCanvas() {
+    this.state.ctx = this.refs.canvas.getContext('2d');
+    
     let str = this.props.value;
     let chars = str.split("");
     let letter_main = chars[0];
     let letter_mid = chars.length > 1 ? chars[1] : " ";
     let letter_sup = chars.length > 2 ? chars[2] : " ";
     let letter_sub = chars.length > 3 ? chars[3] : " ";
-    
+
     const path = "images/";
     const suffix = ".png";
     
-    let main = path + letter_main + "main" + suffix;
-    let mainImg = <img src={main} className="base-image" />;
-
-    let midImg = null;
+    let imageCount = 1;
+    let paths = [];
+    paths[0] = path + letter_main + "main" + suffix;
     if (chars.length > 1 && ' ' != chars[1]) {
-      midImg = <img src={path + letter_main + "mid" + chars[1] + suffix} className="image" />;
+      paths[1] = path + letter_main + "mid" + chars[1] + suffix;
+      ++imageCount;
     }
-    let supImg = null;
     if (chars.length > 2 && ' ' != chars[2]) {
-      supImg = <img src={path + letter_main + "sup" + chars[2] + suffix} className="image" />;
+      paths[2] = path + letter_main + "sup" + chars[2] + suffix;
+      ++imageCount;
     }
-    let subImg = null;
     if (chars.length > 3 && ' ' != chars[3]) {
-      subImg = <img src={path + letter_main + "sub" + chars[3] + suffix} className="image" />;
+      paths[3] = path + letter_main + "sub" + chars[3] + suffix;
+      ++imageCount;
     }
+    this.state.images_to_load = imageCount;
+
+    let state = this.state;
+    
+    for (let i = 0; i < 4; ++i) {
+      if (paths[i]) {
+        let newImg = new Image();
+        newImg.src = paths[i];
+        this.state.images[i] = newImg;
+        newImg.onload = function() {
+          state.images_to_load -= 1;
+          if (state.images_to_load <= 0) {
+            for (let i = 0; i < 4; ++i) {
+              if (null != state.images[i]) {
+                state.ctx.drawImage(state.images[i], 0, 0);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  render() {
+    const CANVAS_WIDTH = 200;
+    const CANVAS_HEIGHT = 200;
     
     return (
-      <div className="glyph-container">
-        {mainImg}
-        {midImg}
-        {supImg}
-        {subImg}
-      </div>
+      <canvas ref="canvas" width={300} height={300}> </canvas>
     );
   }
 }
@@ -52,56 +83,20 @@ class GlyphContainer extends React.Component {
     return (
       <div>
         <hr />
-        <Glyph value="o" />
-        <Glyph value="oi"/>
-        <Glyph value="oiv"/>
-        <Glyph value="oivd" />
+          <Glyph value="o" />
+          <Glyph value="oi"/>
+          <Glyph value="o v" />
+          <Glyph value="oiv"/>
+          <Glyph value="o  d" />
+          <Glyph value="oi d" />
+          <Glyph value="o vd" />
+          <Glyph value="oivd" />
         <hr />
       </div>
     );
   }
 }
 
-class Square extends React.Component {
-  render() {
-    return (
-      <button className="square">
-        {/* TODO */}
-      </button>
-    );
-  }
-}
-
-class Board extends React.Component {
-  renderSquare(i) {
-    return <Square />;
-  }
-
-  render() {
-    const status = 'Next player: X';
-
-    return (
-      <div>
-        <div className="status">{status}</div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
-  }
-}
 
 class Game extends React.Component {
   render() {
@@ -118,8 +113,6 @@ class Game extends React.Component {
     );
   }
 }
-
-// ========================================
 
 ReactDOM.render(
   <Game />,
