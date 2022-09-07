@@ -54,10 +54,10 @@ class Glyph extends React.Component {
             let w = -1;
             let h = -1;
             // Determine total width and height of all images.
-            for (let ii = 0; ii < chars.length; ++ii) {
-              if (null != newState.images[i]) {
-                w = Math.max(w, newState.images[i].width);
-                h = Math.max(h, newState.images[i].height);
+            for (let iDims = 0; iDims < chars.length; ++iDims) {
+              if (null != newState.images[iDims]) {
+                w = Math.max(w, newState.images[iDims].width);
+                h = Math.max(h, newState.images[iDims].height);
               }
             }
 
@@ -66,9 +66,9 @@ class Glyph extends React.Component {
             newState.ctx.canvas.height = h;
 
             // Draw images into canvas.
-            for (let jj = 0; jj < chars.length; ++jj) {
-              if (null != newState.images[jj]) {
-                newState.ctx.drawImage(newState.images[jj], 0, 0);
+            for (let iDraw = 0; iDraw < chars.length; ++iDraw) {
+              if (null != newState.images[iDraw]) {
+                newState.ctx.drawImage(newState.images[iDraw], 0, 0);
               }
             }
           }
