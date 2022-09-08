@@ -1,0 +1,68 @@
+// This is a Pebble script.
+// https://github.com/PatrickCyr/pebble
+
+List<string> chars = new [["o", "v", "i", "d"]];
+List<string> midchars = new [["o", "v", "i", "d", " "]];
+
+// Code exceptions here.
+string ValidateGlyph(string glyph) {
+	string main = String::Substring(glyph, 0, 1);
+	string center = #glyph > 1 ? String::Substring(glyph, 1, 1) : "";
+	string super = #glyph > 3 ? String::Substring(glyph, 3, 1) : "";
+	
+	// If i is main glyph, there are no valid center letters.
+	if (#glyph > 1 && main == "i" && center != " ") {
+		Print("Rejecting \"", glyph, "\" because 'i' can't have central letters.");
+		return "";
+	}
+	
+	// If v is main letter, the only valid superscript letter is "i".
+	// 0=main, 1=center, 2=sub, 3=super
+	
+	if (#glyph > 3 && main == "v" && super != "i") {
+		Print("Rejecting \"", glyph, "\" because 'v' only allows 'i' as superscript.");
+		return "";
+	}
+	
+	return ","..glyph;
+}
+
+string GenerateAllCombos() {
+	string output;
+	
+	// Single char.
+	foreach (ix, char in chars) {
+		output ..= ValidateGlyph(char);
+	}
+	
+	// 2
+	foreach (ix, char1 in chars) {
+		foreach (ix2, char2 in chars) {
+			output ..= ValidateGlyph(char1..char2);
+		}
+	}
+	
+	// 3
+	foreach (ix, char1 in chars) {
+		foreach (ix2, char2 in midchars) {
+			foreach (ix3, char3 in chars) {
+				output ..= ValidateGlyph(char1..char2..char3);
+			}
+		}
+	}
+	
+	// 4
+	foreach (ix, char1 in chars) {
+		foreach (ix2, char2 in midchars) {
+			foreach (ix3, char3 in midchars) {
+				foreach (ix4, char4 in chars) {
+					output ..= ValidateGlyph(char1..char2..char3..char4);
+				}
+			}
+		}
+	}
+	
+	output;
+}
+
+GenerateAllCombos();

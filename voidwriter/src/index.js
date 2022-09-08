@@ -74,6 +74,9 @@ class Glyph extends React.Component {
           }
           // *** onload handler end
         }
+        newImg.onerror = function() {
+            console.error("Failed to load " + newImg.src + ", glyph '"+str+"' failed to render.");
+        }
       }
     }
 
